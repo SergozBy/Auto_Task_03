@@ -5,11 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderCardTest {
     private WebDriver driver;
@@ -100,7 +102,7 @@ public class OrderCardTest {
 
     // Negative test invalid enter of phone number #1 - short number
     @Test
-    void shouldInformAboutInvalidPhone1() {
+    void shouldInformAboutInvalidPhone_1() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
         // step with enter invalid phone number
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+7123");
@@ -113,7 +115,7 @@ public class OrderCardTest {
 
     // Negative test invalid enter of phone number #2 latin letters
     @Test
-    void shouldInformAboutInvalidPhone2() {
+    void shouldInformAboutInvalidPhone_2() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
         // step with enter invalid phone number
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("abcdefghikl");
@@ -126,7 +128,7 @@ public class OrderCardTest {
 
     // Negative test invalid enter of phone number #3 cyrillic letters
     @Test
-    void shouldInformAboutInvalidPhone3() {
+    void shouldInformAboutInvalidPhone_3() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
         // step with enter invalid phone number
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("абвгдеёжзий");
@@ -143,9 +145,48 @@ public class OrderCardTest {
     void shouldInformAboutWithoutAgreement() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+71231234567");
-        // step with select agreement checkbox
+        // step without select agreement checkbox
         driver.findElement(By.cssSelector("button")).click();
 
         assertTrue(driver.findElement(By.cssSelector("[data-test-id='agreement'].input_invalid")).isDisplayed());
+    }
+
+    // Negative test invalid enter of name and phone number: should inform about first invalid fild - name only
+    @Test
+    void shouldInformAboutFirstInvalidField_1() {
+        //step with enter invalid name
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("John Travolta");
+        // step with enter invalid phone number
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+7123");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button")).click();
+
+        // Check that only the first incorrectly filled field will be highlighted.
+        String inputSub = driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub")).getText().trim();
+        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", inputSub);
+
+        List<WebElement> listOfElements = driver.findElements(By.cssSelector(".input_invalid"));
+        boolean countElements;
+        countElements = listOfElements.size() == 1;
+        assertTrue(countElements);
+    }
+
+    // Negative test invalid enter of phone number without agreement: should inform about first invalid fild - pone number only
+    @Test
+    void shouldInformAboutFirstInvalidField_2() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
+        // step with enter invalid phone number
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+7123");
+        // step without select agreement checkbox
+        driver.findElement(By.cssSelector("button")).click();
+
+        // Check that only the first incorrectly filled field will be highlighted.
+        String inputSub = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub")).getText().trim();
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", inputSub);
+
+        List<WebElement> listOfElements = driver.findElements(By.cssSelector(".input_invalid"));
+        boolean countElements;
+        countElements = listOfElements.size() == 1;
+        assertTrue(countElements);
     }
 }
