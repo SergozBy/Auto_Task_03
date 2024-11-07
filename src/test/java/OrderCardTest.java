@@ -9,6 +9,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OrderCardTest {
     private WebDriver driver;
@@ -56,7 +57,7 @@ public class OrderCardTest {
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
         driver.findElement(By.cssSelector("button")).click();
 
-        String inputSub = driver.findElement(By.cssSelector("[data-test-id='name'] span.input__sub")).getText().trim();
+        String inputSub = driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub")).getText().trim();
         assertEquals("Поле обязательно для заполнения", inputSub);
     }
 
@@ -68,7 +69,7 @@ public class OrderCardTest {
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
         driver.findElement(By.cssSelector("button")).click();
 
-        String inputSub = driver.findElement(By.cssSelector("[data-test-id='phone'] span.input__sub")).getText().trim();
+        String inputSub = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub")).getText().trim();
         assertEquals("Поле обязательно для заполнения", inputSub);
     }
 
@@ -80,77 +81,71 @@ public class OrderCardTest {
         // step with select agreement checkbox
         driver.findElement(By.cssSelector("button")).click();
 
-        Object classColor = driver.findElement(By.cssSelector("[data-test-id='agreement'] span.checkbox__text")).getCssValue("color");
-        assertEquals("rgba(255, 92, 92, 1)", classColor);
+        assertTrue(driver.findElement(By.cssSelector("[data-test-id='agreement'].input_invalid")).isDisplayed());
     }
 
     // TASK 2 - OPTIONAL
     // Negative test invalid enter of name
     @Test
-    void shouldNotSendFormWithInvalidName() {
+    void shouldInformAboutInvalidName() {
         // step with invalid enter name
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("John Travolta");
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+71231234567");
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
         driver.findElement(By.cssSelector("button")).click();
 
-        String classes = driver.findElement(By.cssSelector("[data-test-id='name']")).getAttribute("class");
-        boolean haveClassInputInvalid = classes.contains("input_invalid");
-        assertEquals(true, haveClassInputInvalid);
+        String inputSub = driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub")).getText().trim();
+        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", inputSub);
     }
 
     // Negative test invalid enter of phone number #1 - short number
     @Test
-    void shouldNotSendFormWithInvalidPhone1() {
+    void shouldInformAboutInvalidPhone1() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
         // step with enter invalid phone number
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+7123");
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
         driver.findElement(By.cssSelector("button")).click();
 
-        String classes = driver.findElement(By.cssSelector("[data-test-id='phone']")).getAttribute("class");
-        boolean haveClassInputInvalid = classes.contains("input_invalid");
-        assertEquals(true, haveClassInputInvalid);
+        String inputSub = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub")).getText().trim();
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", inputSub);
     }
 
     // Negative test invalid enter of phone number #2 latin letters
     @Test
-    void shouldNotSendFormWithInvalidPhone2() {
+    void shouldInformAboutInvalidPhone2() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
         // step with enter invalid phone number
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("abcdefghikl");
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
         driver.findElement(By.cssSelector("button")).click();
 
-        String classes = driver.findElement(By.cssSelector("[data-test-id='phone']")).getAttribute("class");
-        boolean haveClassInputInvalid = classes.contains("input_invalid");
-        assertEquals(true, haveClassInputInvalid);
+        String inputSub = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub")).getText().trim();
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", inputSub);
     }
 
-    // Negative test invalid enter of phone number #2 cyrillic letters
+    // Negative test invalid enter of phone number #3 cyrillic letters
     @Test
-    void shouldNotSendFormWithInvalidPhone3() {
+    void shouldInformAboutInvalidPhone3() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
         // step with enter invalid phone number
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("абвгдеёжзий");
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
         driver.findElement(By.cssSelector("button")).click();
 
-        String classes = driver.findElement(By.cssSelector("[data-test-id='phone']")).getAttribute("class");
-        boolean haveClassInputInvalid = classes.contains("input_invalid");
-        assertEquals(true, haveClassInputInvalid);
+        String inputSub = driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub")).getText().trim();
+        assertEquals("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678.", inputSub);
     }
 
     // Negative test without select agreement checkbox
+    // Duplicate of shouldNotSendFormWithoutAgreement
     @Test
-    void shouldNotSendFormWithoutAgreement2() {
+    void shouldInformAboutWithoutAgreement() {
         driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
         driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+71231234567");
         // step with select agreement checkbox
         driver.findElement(By.cssSelector("button")).click();
 
-        String classes = driver.findElement(By.cssSelector("[data-test-id='agreement']")).getAttribute("class");
-        boolean haveClassInputInvalid = classes.contains("input_invalid");
-        assertEquals(true, haveClassInputInvalid);
+        assertTrue(driver.findElement(By.cssSelector("[data-test-id='agreement'].input_invalid")).isDisplayed());
     }
 }
