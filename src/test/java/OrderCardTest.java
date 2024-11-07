@@ -35,6 +35,7 @@ public class OrderCardTest {
     }
 
     // TASK 1
+
     // Positive test with valid data
     @Test
     void shouldSendForm() {
@@ -81,5 +82,75 @@ public class OrderCardTest {
 
         Object classColor = driver.findElement(By.cssSelector("[data-test-id='agreement'] span.checkbox__text")).getCssValue("color");
         assertEquals("rgba(255, 92, 92, 1)", classColor);
+    }
+
+    // TASK 2 - OPTIONAL
+    // Negative test invalid enter of name
+    @Test
+    void shouldNotSendFormWithInvalidName() {
+        // step with invalid enter name
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("John Travolta");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+71231234567");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button")).click();
+
+        String classes = driver.findElement(By.cssSelector("[data-test-id='name']")).getAttribute("class");
+        boolean haveClassInputInvalid = classes.contains("input_invalid");
+        assertEquals(true, haveClassInputInvalid);
+    }
+
+    // Negative test invalid enter of phone number #1 - short number
+    @Test
+    void shouldNotSendFormWithInvalidPhone1() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
+        // step with enter invalid phone number
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+7123");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button")).click();
+
+        String classes = driver.findElement(By.cssSelector("[data-test-id='phone']")).getAttribute("class");
+        boolean haveClassInputInvalid = classes.contains("input_invalid");
+        assertEquals(true, haveClassInputInvalid);
+    }
+
+    // Negative test invalid enter of phone number #2 latin letters
+    @Test
+    void shouldNotSendFormWithInvalidPhone2() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
+        // step with enter invalid phone number
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("abcdefghikl");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button")).click();
+
+        String classes = driver.findElement(By.cssSelector("[data-test-id='phone']")).getAttribute("class");
+        boolean haveClassInputInvalid = classes.contains("input_invalid");
+        assertEquals(true, haveClassInputInvalid);
+    }
+
+    // Negative test invalid enter of phone number #2 cyrillic letters
+    @Test
+    void shouldNotSendFormWithInvalidPhone3() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
+        // step with enter invalid phone number
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("абвгдеёжзий");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button")).click();
+
+        String classes = driver.findElement(By.cssSelector("[data-test-id='phone']")).getAttribute("class");
+        boolean haveClassInputInvalid = classes.contains("input_invalid");
+        assertEquals(true, haveClassInputInvalid);
+    }
+
+    // Negative test without select agreement checkbox
+    @Test
+    void shouldNotSendFormWithoutAgreement2() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Джон Траволта");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+71231234567");
+        // step with select agreement checkbox
+        driver.findElement(By.cssSelector("button")).click();
+
+        String classes = driver.findElement(By.cssSelector("[data-test-id='agreement']")).getAttribute("class");
+        boolean haveClassInputInvalid = classes.contains("input_invalid");
+        assertEquals(true, haveClassInputInvalid);
     }
 }
